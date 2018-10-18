@@ -1,166 +1,406 @@
-﻿<p align="center">
-  <a href ="##"><img alt="Omi" src="http://images2015.cnblogs.com/blog/105416/201701/105416-20170120114244046-622856943.png"></a>
-</p>
-<p align="center">
-Open and modern framework for building user interfaces.
-</p>
-<p align="center">
-  <a href="https://travis-ci.org/AlloyTeam/omi"><img src="https://travis-ci.org/AlloyTeam/omi.svg"></a>
-</p>
+English | [简体中文](./README.CN.md) 
+
+# Omi
+
+> Next generation web framework in 4KB javascript(Merge JSX, Webcomponents, Proxy, Path Updating together).
+
+<p align="center"><img src="./assets/omi.png" alt="omi"/></p>
+
+### Why Omi？
+
+- Tiny size(4KB gzip)
+- Support TypeScript    
+- Reactive data-binding
+- Compliance with browser trend and API design
+- Merge JSX and Webcomponents into One Framework 
+- Webcomponents can also be a data-driven view, UI = fn(data)
+- JSX is the best development experience (code intelligent  completion and tip) UI Expression with least [grammatical noise](https://github.com/facebook/jsx#why-not-template-literals)
+- The original Path Updating system. Proxy-based automatic accurate update, low power consumption, high degree of freedom, excellent performance, easy integration of requestIdleCallback
+- Say goodbye to `this.update` method when using store system! It will update partial UI automatically when data changed. 
+- Look at [Facebook React VS Webcomponents](https://softwareengineering.stackexchange.com/questions/225400/pros-and-cons-of-facebooks-react-vs-web-components-polymer)，Omi combines their advantages and gives developers the freedom to choose the way they like.
+- Shadom DOM merges with Virtual DOM, Omi uses both virtual DOM and real Shadom DOM to make view updates more accurate and faster
+- With a Store system, 99.9% of projects don't need time travel, and not only Redux can travel, please don't come up on redux, Omi store system can meet all projects
+- Scoped CSS's best solution is Shadow DOM, the community churning out frameworks and libraries for Scoped CSS (using JS or JSON writing styles such as Radium, jsxstyle, react-style; binding to webpack using generated unique className `filename-classname-hash', such as CSS Modules, Vue), are hack technologies; and Shadow DOM Style is the perfect solution.
+
+Compare TodoApp by Omi and React, Omi and React rendering DOM structure:
+
+![](./assets/omi-render.jpg) ![](./assets/react-render.jpg)
+
+On the left is Omi, the right side is React, and Omi uses Shadow DOM isolation style and semantic structure.
 
 ---
 
-## 中文 | [English](https://github.com/AlloyTeam/omi#english--中文)
+- [Add Omi in One Minute](#add-omi-in-one-minute)
+- [Getting Started](#getting-started)
+    - [Install](#install)
+	- [Hello Element](#hello-element)
+    - [TodoApp](#todoapp)
+    - [Store](#store)
+	- [Lifecycle](#lifecycle)
+- [Component Ecosystem](#component-ecosystem)
+- [Browsers Support](#browsers-support)
+- [Links](#links)
+- [License](#license)
 
-* [Omi 官网](http://www.omijs.org)
-* [Omi Github](https://github.com/AlloyTeam/omi)
-* [Omi Playground](http://alloyteam.github.io/omi/example/playground/)
-* [Omi 文档](https://github.com/AlloyTeam/omi/blob/master/tutorial/all.md)
-* [Omi 教程](https://github.com/AlloyTeam/omi/tree/master/tutorial#omi-相关文章)
-* [Omi Cli](https://github.com/AlloyTeam/omi/tree/master/cli)
-* [New issue](https://github.com/AlloyTeam/omi/issues/new)
-* 如果想更加方便的交流关于Omi的一切可以加入QQ的Omi交流群(256426170)
+## Add Omi in One Minute
 
-## 命令行
+This page demonstrates using Omi with no build tooling.
 
-``` js
-$ npm install omi-cli -g       //安装cli
-$ omi init your_project_name   //初始化项目，你也可以在一个空的文件夹下执行 omi init
-$ cd your_project_name         //如果你是在空文件夹下执行的 omi init。请无视这条命令
-$ npm run dev                  //开发
-$ npm run dist                 //部署发布
+* [Online Demo!](https://tencent.github.io/omi/assets/)
+* [Omi.js CDN](https://unpkg.com/omi)
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Omi in One Minute</title>
+</head>
+
+<body>
+  <script src="https://unpkg.com/omi"></script>
+  <script>
+    const { WeElement, h, render, define } = Omi
+
+    class LikeButton extends WeElement {
+      install() {
+        this.data = { liked: false }
+      }
+
+      render() {
+        if (this.data.liked) {
+          return 'You liked this.'
+        }
+
+        return h(
+          'button',
+          {
+            onClick: () => {
+              this.data.liked = true
+              this.update()
+            }
+          },
+          'Like'
+        )
+      }
+    }
+
+    define('like-button', LikeButton)
+
+    render(h('like-button'), 'body')
+  </script>
+</body>
+
+</html>
 ```
 
-## 特性
+## Getting Started
 
-* 超小的尺寸，7 kb (gzip)
-* 良好的兼容性，支持IE8（请自行引用 es5-shim 或 [es5-sham](//s.url.cn/qqun/xiaoqu/buluo/p/js/es5-sham-es5-sham.min.77c4325f.js)）
-* 完全面向对象的组件体系
-* 局部CSS，HTML+ Scoped CSS + JS组成可复用的组件
-* 更自由的更新，每个组件都有update方法，自由选择时机进行更新
-* 模板引擎可替换，开发者可以重写Omi.template方法来使用任意模板引擎
-* 提供了ES6+和ES5的两种开发方案供开发者自由选择
 
-## 插件
+### Install
 
-* [omi-router](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-router) : Omi专属的官方Router插件.
-* [omi-finger](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-finger) Omi的[AlloyFinger](https://github.com/AlloyTeam/AlloyFinger)插件，支持各种触摸事件和手势
-* [omi-transform](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-transform) Omi的[transformjs](https://alloyteam.github.io/AlloyTouch/transformjs/)插件，快速方便地设置DOM的CSS3 Transform属性
-* [omi-touch](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-touch) Omi的[AlloyTouch](https://github.com/AlloyTeam/AlloyTouch)插件，Omi项目的触摸运动解决方案（支持触摸滚动、旋转、翻页、选择等等）
-* [omi-jquery-date-picker](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-jquery-date-picker) Omi的时间选择插件，支持各种时间或者时间区域选择
-
-## 通过npm安装
-
-``` js
-$ npm install omi
+```bash
+$ npm i omi-cli -g               # install cli
+$ omi init your_project_name     # init project, you can also exec 'omi init' in an empty folder
+$ cd your_project_name           # please ignore this command if you executed 'omi init' in an empty folder
+$ npm start                      # develop
+$ npm run build                  # release
 ```
 
-## Hello World
+### Hello Element
 
-你可以使用 [webpack](https://webpack.github.io/) + [babel](http://babeljs.io/)，在webpack配置的module设置[babel-loader](https://github.com/babel/babel-loader)，立马就能使用ES6+来编写你的web程序。
+Define a custom element:
 
-* [[Hello World ES6+ ->在线试试]](http://alloyteam.github.io/omi/website/redirect.html?type=hello_nest)
-* [[Hello World ES5  ->在线试试]](http://alloyteam.github.io/omi/website/redirect.html?type=hello_es5)
+```js
+import { tag, WeElement, render } from 'omi'
 
-如果使用omi.lite.js版本(不包含[mustache.js](https://github.com/janl/mustache.js)模板引擎)的话，也可以[使用 ${this.data.name} 的方式](http://alloyteam.github.io/omi/website/redirect.html?type=without_tpl)。
+@tag('hello-element')
+class HelloElement extends WeElement {
 
-## CDN
+    onClick = (evt) => {
+        //trigger CustomEvent
+        this.fire('abc', { name : 'dntzhang', age: 12 })
+        evt.stopPropagation()
+    }
 
-* [https://unpkg.com/omi@1.6.3/dist/omi.min.js](https://unpkg.com/omi@1.6.3/dist/omi.min.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.js](https://unpkg.com/omi@1.6.3/dist/omi.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.lite.min.js](https://unpkg.com/omi@1.6.3/dist/omi.lite.min.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.lite.js](https://unpkg.com/omi@1.6.3/dist/omi.lite.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.mustache.min.js](https://unpkg.com/omi@1.6.3/dist/omi.mustache.min.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.mustache.js](https://unpkg.com/omi@1.6.3/dist/omi.mustache.js)
+    css() {
+        return `
+         div{
+             color: red;
+             cursor: pointer;
+         }`
+    }
 
-## 感谢 
-
-* [morphdom](https://github.com/patrick-steele-idem/morphdom)-Fast and lightweight DOM diffing/patching (no virtual DOM needed)
-* [sodajs](https://github.com/AlloyTeam/sodajs)-Light weight but powerful template engine for JavaScript 
-* [mustache.js](https://github.com/janl/mustache.js)-Minimal templating with {{mustaches}} in JavaScript
-
-## English | [﻿中文](https://github.com/AlloyTeam/omi#中文--english)
-
-* If you want to experience the Omi framework, you can visit [Omi Playground](https://alloyteam.github.io/omi/example/playground/) or read the code of [TodoMVC by Omi](https://github.com/AlloyTeam/omi/tree/master/todomvc)
-* If you want to use the Omi framework or develop and improve omi framework, please read [the Omi documentation](https://github.com/AlloyTeam/omi/tree/master/docs#omi使用文档)
-* If you want to get a better reading experience of the documents, you can visit [Docs Website](https://alloyteam.github.io/omi/website/docs.html)
-* Tutorial or blogs about omi framework，you can visit [Omi Tutorial](https://github.com/AlloyTeam/omi/tree/master/tutorial)
-* If you are too lazy to build a project scaffolding, you can try [omi-cli](https://github.com/AlloyTeam/omi/tree/master/cli)
-* If you have Any problems，please [New issue](https://github.com/AlloyTeam/omi/issues/new)
-* If you want to be more convenient on the exchange of all Omi can join the QQ Omi exchange group (256426170)
-
-## omi-cli
-
-``` js
-$ npm install omi-cli -g       //install cli
-$ omi init your_project_name   //init project, you can also exec 'omi init' in an empty folder
-$ cd your_project_name         //please ignore this command if you executed 'omi init' in an empty folder
-$ npm run dev                  //develop
-$ npm run dist                 //release
+    render(props) {
+        return (
+            <div onClick={this.onClick}>
+                Hello {props.msg} {props.propFromParent}
+                <div>Click Me!</div>
+            </div>
+        )
+    }   
+}
 ```
 
-## Features
-
-* Super tiny size, 7 KB (gzip)
-* Good compatibility, support IE8 (please import es5-shim or [es5-sham](//s.url.cn/qqun/xiaoqu/buluo/p/js/es5-sham-es5-sham.min.77c4325f.js) by yourself)
-* Fully object-oriented component system
-* Support Scoped CSS, reusable components are composed of HTML， Scoped CSS and JS
-* More free updates, each component has a update method, free to choose the right time to update
-* Template engines can be replaced, developers can override the Omi.template method to use any template engine
-* Provides two development way ( ES6+ and ES5) for developers to choose freely
-
-## Plugins
-
-* [omi-router](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-router) :  Router for Omi.
-* [omi-finger](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-finger) :  Omi /[AlloyFinger](https://github.com/AlloyTeam/AlloyFinger) integration.
-* [omi-transform](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-transform) :  Omi /[transformjs](https://alloyteam.github.io/AlloyTouch/transformjs/) integration.
-* [omi-touch](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-touch) :  Omi /[AlloyTouch](https://github.com/AlloyTeam/AlloyTouch) integration.
-* [omi-jquery-date-picker](https://github.com/AlloyTeam/omi/tree/master/plugins/omi-jquery-date-picker):  Omi / JQuery Date Picker integration.
-
-## Install
+Using `hello-element`:
 
 ``` js
-$ npm install omi
+import { tag, WeElement, render } from 'omi'
+import './hello-element'
+
+@tag('my-app')
+class MyApp extends WeElement {
+    static get data() {
+        return { abc: '', passToChild: '' }
+    }
+
+    //bind CustomEvent 
+    onAbc = (evt) => {
+        // get evt data by evt.detail
+        this.data.abc = ' by ' + evt.detail.name
+        this.update() 
+    }
+
+    css() {
+        return `
+         div{
+             color: green;
+         }`
+    }
+
+    render(props, data) {
+        return (
+            <div>
+                Hello {props.name} {data.abc}
+                <hello-element onAbc={this.onAbc} prop-from-parent={data.passToChild} msg="WeElement"></hello-element>
+            </div>
+        )
+    }
+}
+
+render(<my-app name='Omi v4.0'></my-app>, 'body')
 ```
 
-## Hello World
+Tell Babel to transform JSX into Omi.h () call:
+
+``` json
+{
+    "presets": ["env", "omi"]
+}
+```
+
+The following two NPM packages need to be installed to support the above configuration:
+
+``` bash
+"babel-preset-env": "^1.6.0",
+"babel-preset-omi": "^0.1.1",
+```
+
+If you don't want to write CSS in js, you can use [to-string-loader](https://www.npmjs.com/package/to-string-loader),
+For example, the following configuration:
+
+``` js
+{
+    test: /[\\|\/]_[\S]*\.css$/,
+    use: [
+        'to-string-loader',
+        'css-loader'
+    ]
+}
+```
+
+If your CSS file starts with "_", CSS will use to-string-loader., such as:
+
+``` js
+import { tag, WeElement render } from 'omi'
+//typeof cssStr is string
+import cssStr from './_index.css' 
+
+@tag('my-app')
+class MyApp extends WeElement {
+
+  css() {
+    return cssStr
+  }
+  ...
+  ...
+  ...
+```
+
+### TodoApp
+
+Here is a relatively complete example of TodoApp:
+
+```js
+import { tag, WeElement, render } from 'omi'
+
+@tag('todo-list')
+class TodoList extends WeElement {
+    render(props) {
+        return (
+            <ul>
+                {props.items.map(item => (
+                    <li key={item.id}>{item.text}</li>
+                ))}
+            </ul>
+        );
+    }
+}
+
+@tag('todo-app')
+class TodoApp extends WeElement {
+    static get data() {
+        return { items: [], text: '' }
+    }
+
+    render() {
+        return (
+            <div>
+                <h3>TODO</h3>
+                <todo-list items={this.data.items} />
+                <form onSubmit={this.handleSubmit}>
+                    <input
+                        id="new-todo"
+                        onChange={this.handleChange}
+                        value={this.data.text}
+                    />
+                    <button>
+                        Add #{this.data.items.length + 1}
+                    </button>
+                </form>
+            </div>
+        );
+    }
+
+    handleChange = (e) => {
+        this.data.text = e.target.value
+    }
+
+    handleSubmit = (e) => {
+        e.preventDefault();
+        if (!this.data.text.trim().length) {
+            return;
+        }
+        this.data.items.push({
+            text: this.data.text,
+            id: Date.now()
+        })
+        this.data.text = ''
+        this.update()
+    }
+}
+
+render(<todo-app></todo-app>, 'body')
+```
+
+### Store
+
+Say goodbye to `this.update` method when using store system! It will update partial UI automatically when data changed. The powerful Store architecture is high-performance because all data is mounted on the store, except for components that rely on props to determine the state of the component.
+
+```js
+export default {
+  data: {
+    items: [],
+    text: '',
+    firstName: 'dnt',
+    lastName: 'zhang',
+    fullName: function () {
+      return this.firstName + this.lastName
+    },
+    globalPropTest: 'abc', //I will refresh all elements without changing the components and page declaring data dependency.
+    ccc: { ddd: 1 } //I will refresh all elements without changing the components and page declaring data dependency.
+  },
+  globalData: ['globalPropTest', 'ccc.ddd'],
+  add: function () {
+    if (!this.data.text.trim().length) {
+        return;
+    }
+    this.data.items.push({
+      text: this.data.text,
+      id: Date.now()
+    })
+    this.data.text = ''
+  }
+  //Default value is false, set to true will update all instances when data changing.
+  //updateAll: true
+}
+```
+
+Custom Element requires declaring dependent data so that Omi stores compute the dependency path based on the data declared on the custom component and update it locally as needed. Such as:
+
+```js
+class TodoApp extends WeElement {
+    //If you use store, the data is only used to declare dependencies.
+    static get data() {
+        return { items: [], text: '' }
+    }
+    ...
+    ...
+    ...
+    handleChange = (e) => {
+        this.store.data.text = e.target.value
+    }
+
+    handleSubmit = (e) => {
+        e.preventDefault()
+        this.store.add()
+    }
+}
+```
+
+* the logic of data is encapsulated in the store definition method (such as store.add).
+* views are only responsible for passing data to store, such as calling store.add or setting store.data.text on top.
+
+You need to inject store from the root node at render time to use this. store:
+
+```js
+render(<todo-app></todo-app>, 'body', store)
+```
+
+[→ Store Full Code](https://github.com/Tencent/omi/blob/master/packages/omi/examples/store/main.js)
 
 
-You can use [webpack](https://webpack.github.io/) + [babel](http://babeljs.io/)，configure the [babel-loader](https://github.com/babel/babel-loader) in  the module settings of webpack，then you can use ES6+ to write your web program.
 
-* [[Hello World ES6+ ->Try it on Playground]](http://alloyteam.github.io/omi/website/redirect.html?type=hello_nest)
-* [[Hello World ES5  ->Try it on Playground]](http://alloyteam.github.io/omi/website/redirect.html?type=hello_es5)
+Summary：
 
-if using 'omi.lite.js' (without [mustache.js](https://github.com/janl/mustache.js))，you can [use the ${this.data.name} way](http://alloyteam.github.io/omi/website/redirect.html?type=without_tpl)。
+* store.data is used to list all attributes and default values (except the components of the view decided by props).
+* The data of the component and page is used to list the attributes of the dependent store.data (Omi will record path) and update on demand.
+* If there are few simple components on the page, updateAll can be set to true, and components and pages don't need to declare data, and they don't update on demand
+* The path declared in globalData refreshes all pages and components by modifying the value of the corresponding path, which can be used to list all pages or most of the public properties Path
 
-## CDN
+### Lifecycle
 
-* [https://unpkg.com/omi@1.6.3/dist/omi.min.js](https://unpkg.com/omi@1.6.3/dist/omi.min.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.js](https://unpkg.com/omi@1.6.3/dist/omi.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.lite.min.js](https://unpkg.com/omi@1.6.3/dist/omi.lite.min.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.lite.js](https://unpkg.com/omi@1.6.3/dist/omi.lite.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.mustache.min.js](https://unpkg.com/omi@1.6.3/dist/omi.mustache.min.js)
-* [https://unpkg.com/omi@1.6.3/dist/omi.mustache.js](https://unpkg.com/omi@1.6.3/dist/omi.mustache.js)
+| Lifecycle method            | When it gets called                              |
+|-------------------------------|--------------------------------------------------|
+| `install`        | before the component gets mounted to the DOM     |
+| `installed`         | after the component gets mounted to the DOM      |
+| `uninstall`      | prior to removal from the DOM                    |
+| `beforeUpdate`       | before `render()`                                |
+| `afterUpdate`        | after `render()`                                 |
 
-## Thanks 
+## Component Ecosystem
 
-* [morphdom](https://github.com/patrick-steele-idem/morphdom)-Fast and lightweight DOM diffing/patching (no virtual DOM needed)
-* [sodajs](https://github.com/AlloyTeam/sodajs)-Light weight but powerful template engine for JavaScript 
-* [mustache.js](https://github.com/janl/mustache.js)-Minimal templating with {{mustaches}} in JavaScript
+* [https://www.webcomponents.org/](https://www.webcomponents.org/)
+* [https://www.webcomponents.org/elements](https://www.webcomponents.org/elements)
 
+I believe you can easily convert webcomponents elements to omi elements.
 
-## Contributors
+## Browsers Support
 
-|name   |avatars   |company   |
-|---|---|---|
-|  [CodeFalling](https://github.com/CodeFalling) |  ![](https://avatars3.githubusercontent.com/u/5436704?v=3&s=60)  |  alibaba |  
-|  [abell123456](https://github.com/abell123456) |  ![](https://avatars1.githubusercontent.com/u/2232380?v=3&s=60)  |  alibaba |  
-|  [Aresn](https://github.com/icarusion) |  ![](https://avatars3.githubusercontent.com/u/5370542?v=3&s=60)  |  TalkingCoder |  
-|  [pasturn](https://github.com/pasturn) |  ![](https://avatars2.githubusercontent.com/u/6126885?v=3&s=60)  | Mars Holding  |  
-|  [vorshen](https://github.com/vorshen) | ![](https://avatars2.githubusercontent.com/u/10334783?v=3&s=60)  |  Tencent |
-|  [xcatliu](https://github.com/xcatliu) |  ![](https://avatars3.githubusercontent.com/u/5453359?v=3&s=60)  |  Microsoft |  
-|  [dorsywang](https://github.com/dorsywang) |  ![](https://avatars3.githubusercontent.com/u/7475208?v=3&s=60)  |  Tencent |  
-|  [dntzhang](https://github.com/dntzhang) | ![](https://avatars2.githubusercontent.com/u/7917954?v=3&s=60)  |  Tencent |
+Omi 4.0+ works in the latest two versions of all major browsers: Safari 10+, ~~IE 11+~~, and the evergreen Chrome, Firefox, and Edge.
 
-# License
-This content is released under the [MIT](http://opensource.org/licenses/MIT) License.
+![Browsers Support](./assets/browsers-support.png)
+
+[→ polyfills](https://github.com/webcomponents/webcomponentsjs)
+
+## Links
+
+- [westore](https://github.com/dntzhang/westore)
+- [omijs.org](http://omijs.org/)
+
+## License
+
+MIT © Tencent 
+
+Please contact me[@dntzhang](https://github.com/dntzhang) for any questions. 
