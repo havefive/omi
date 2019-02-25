@@ -1,60 +1,37 @@
-import { WeElement, tag } from '../../src/omi'
+import { define, WeElement } from '../../src/omi'
 
-@tag('hello-element')
-class HelloElement extends WeElement {
+define('hello-element', class extends WeElement {
+  static defaultProps = {
+    msg: '',
+    propFromParent: '123111',
+    testDefault: 'abc'
+  }
 
-    static get props(){
-        return {
-            propFromParent: {
-                value: '9'
-            },
-            msg: {
-                value: ''
-            },
-            num :{
-                value :10
-            }
-        }
-    }
+  onClick = evt => {
+    // trigger CustomEvent
+    this.fire('myEvent', { name: 'dntzhang', age: 12 })
+    evt.stopPropagation()
+  }
 
-    static get data() {
-        return {
-            a: 1,
-            b: {
-                c: 2
-            }
-        }
-    }
+  css() {
+    return `
+        div {
+          color: red;
+          cursor: pointer;
+        }`
+  }
 
-    onClick = (evt) => {
-        //trigger CustomEvent
-        this.fire('abc', { name : 'dntzhang', age: 12 })
-        evt.stopPropagation()
-    }
+  receiveProps(props, data, oldProps) {
+    console.log(props, data, oldProps)
+  }
 
-    installed(){
-        setTimeout(() => {
-            this.data.a = 2
-            this.update()
-        }, 1000);
-    }
-
-    css() {
-        return `
-         div{
-             color: red;
-             cursor: pointer;
-         }`
-    }
-
-    render(props, data) {
-        return (
-            <div onClick={this.onClick}>
-                Hello {props.msg} {props.propFromParent}
-                <div>Click Me!{props.num}</div>
-                <div>data: {data.a}</div>
-                <div>props {props.num}</div>
-            </div>
-        )
-    }
-}
+  render(props) {
+    return (
+      <div onClick={this.onClick}>
+        Hello {props.msg} {props.propFromParent}
+        <div>Click Me!</div>
+        <div>{props.testDefault}</div>
+      </div>
+    )
+  }
+})

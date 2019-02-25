@@ -1,6 +1,6 @@
 {
   "props": {
-    "cname": 26,
+    "cname": 37,
     "props": {
       "$_dirty": "__d",
       "$_disable": "__x",
@@ -26,7 +26,17 @@
       "$__omiSsrData": "x",
       "$_vd": "y",
       "$_css": "z",
-      "$_proxifyObjectTreeRecursively": "A"
+      "$_proxifyObjectTreeRecursively": "A",
+      "$_isInstalled": "B",
+      "$_useId": "C",
+      "$_useMap": "D",
+      "$___touchX": "F",
+      "$___touchY": "G",
+      "$___scrollTop": "H",
+      "$__elementId": "I",
+      "$_willUpdate": "J",
+      "$_preCss": "K",
+      "$_host": "L"
     }
   },
   "vars": {
